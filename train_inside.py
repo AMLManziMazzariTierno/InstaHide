@@ -148,10 +148,9 @@ def generate_sample(trainloader):
         mix_inputs, mix_targets, lams = mixup_data(
             inputs, targets.float(), use_cuda)
 
-        mixed_x_np = mix_inputs[0].cpu().numpy().transpose(1, 2, 0)
-        mixed_x_img = Image.fromarray((mixed_x_np * 255).astype(np.uint8))
-        mixed_x_img.save("image_after_encoding.png")
-
+       
+    plt.imshow(mix_inputs[0])
+    plt.show()
 
     return (mix_inputs, mix_targets, lams)
 
@@ -251,6 +250,9 @@ def adjust_learning_rate(optimizer, epoch):
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
 
+def prova1():
+    return(2)
+
 
 def main():
     global best_acc
@@ -316,11 +318,8 @@ def main():
     
     img_prova, label = testloader.dataset[0]
     
-    to_pil = ToPILImage()
-    pil_image = to_pil(img_prova)
-
-    pil_image.save("image_before_encoding.png")
-
+    plt.imshow(img_prova)
+    plt.show()
 
 
     ## --------------- Create the model --------------- ##
