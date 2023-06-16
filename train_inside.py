@@ -369,6 +369,10 @@ def main():
     plt.show()
     display(plt.gcf())
 
+    pil_img = Image.fromarray((before_img.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8))
+
+# Visualizza l'immagine PIL
+    display(pil_img)
 
 
 
