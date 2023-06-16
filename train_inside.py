@@ -366,6 +366,8 @@ def main():
     img_prova, label = testloader.dataset[0]
     #labels = torch.as_tensor((label,), device=setup['device'])
     before_img = img_prova.unsqueeze(0)
+
+    before_img = before_img.to(device)
     plot(before_img);
 
 
