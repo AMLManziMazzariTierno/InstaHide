@@ -138,12 +138,12 @@ def mixup_data(x, y, use_cuda=True):
     return mixed_x, ys, lams
 
 
-def generate_sample(trainloader):
+def generate_sample(trainloader, transform_original):
     assert len(trainloader) == 1        # Load all training data once
     for _, (inputs, targets) in enumerate(trainloader):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
-        image_before_encoding = inputs[0].cpu().numpy().transpose(1, 2, 0)
+        image_before_encoding = transform_original(inputs[0])
         image_before_encoding = Image.fromarray((image_before_encoding * 255).astype(np.uint8))
         image_before_encoding.save("image_before_encoding.png")
 
@@ -284,6 +284,12 @@ def main():
             cifar_normalize
         ])
 
+
+    transform_original = transforms.Compose([
+        transforms.ToTensor(),
+        cifar_normalize
+    ])
+
     if args.data == 'cifar100':
         trainset = datasets.CIFAR100(root='./data',
                                     train=True,
@@ -348,7 +354,7 @@ def main():
             ])
 
     for epoch in range(start_epoch, args.epoch):
-        mix_inputs_all, mix_targets_all, lams = generate_sample(trainloader)
+        mix_inputs_all, mix_targets_all, lams = generate_sample(trainloader, transform_original)
         
         train_loss, _ = train(
             net, optimizer, mix_inputs_all, mix_targets_all, lams, epoch)
