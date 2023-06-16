@@ -18,6 +18,7 @@ import torchvision.datasets as datasets
 import torch.nn.functional as F
 import random
 
+from PIL import Image
 import matplotlib.pyplot as plt
 
 import models
@@ -132,6 +133,8 @@ def mixup_data(x, y, use_cuda=True):
     if args.mode == 'instahide':
         sign = torch.randint(2, size=list(x.shape), device=device) * 2.0 - 1
         mixed_x *= sign.float().to(device)
+
+    
     return mixed_x, ys, lams
 
 
@@ -141,9 +144,18 @@ def generate_sample(trainloader):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         image_before_encoding = inputs[0].cpu().numpy().transpose(1, 2, 0)
+        image_before_encoding = Image.fromarray((image_before_encoding * 255).astype(np.uint8))
+        image_before_encoding.save("image_before_encoding.png")
+
         mix_inputs, mix_targets, lams = mixup_data(
             inputs, targets.float(), use_cuda)
-    return (mix_inputs, mix_targets, lams, image_before_encoding)
+
+        mixed_x_np = mix_inputs[0].cpu().numpy().transpose(1, 2, 0)
+        mixed_x_img = Image.fromarray((mixed_x_np * 255).astype(np.uint8))
+        mixed_x_img.save("image_after_encoding.png")
+
+
+    return (mix_inputs, mix_targets, lams)
 
 
 def train(net, optimizer, inputs_all, mix_targets_all, lams, epoch):
@@ -336,27 +348,7 @@ def main():
             ])
 
     for epoch in range(start_epoch, args.epoch):
-        mix_inputs_all, mix_targets_all, lams, image_before_encoding = generate_sample(trainloader)
-
-        
-        plt.imsave('image_before_encoding.jpg', image_before_encoding)  # Salva l'immagine nel percorso specificato
-
-        image_after_encoding = mix_inputs_all[0].cpu().detach().numpy().transpose(1, 2, 0)
-        plt.imsave('image_after_encoding.jpg', image_after_encoding)  # Salva l'immagine nel percorso specificato
-
-        # Visualizza l'immagine prima dell'encoding
-        plt.figure()
-        plt.title('Image Before Encoding')
-        plt.imshow(image_before_encoding)
-        plt.axis('off')
-
-        # Visualizza l'immagine dopo l'encoding
-        plt.figure()
-        plt.title('Image After Encoding')
-        plt.imshow(image_after_encoding)
-        plt.axis('off')
-
-        plt.show()
+        mix_inputs_all, mix_targets_all, lams = generate_sample(trainloader)
         
         train_loss, _ = train(
             net, optimizer, mix_inputs_all, mix_targets_all, lams, epoch)
