@@ -18,22 +18,24 @@ import torchvision.datasets as datasets
 import torch.nn.functional as F
 import random
 
+import matplotlib.pyplot as plt
+
 import models
 from utils import progress_bar, chunks, save_fig
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 parser = argparse.ArgumentParser(
-    description='PyTorch InstaHide Training, CIFAR-10')
+    description='PyTorch InstaHide Training, CIFAR-100')
 
 # Training configurations
 parser.add_argument('--model',
-                    default="ResNet18",
+                    default="resnet20",
                     type=str,
-                    help='model type (default: ResNet18)')
-parser.add_argument('--data', default='cifar10', type=str,
+                    help='model type (default: ResNet20)')
+parser.add_argument('--data', default='cifar100', type=str,
                     help='dataset')
-parser.add_argument('--nclass', default=10, type=int,
+parser.add_argument('--nclass', default=100, type=int,
                     help='number of classes')
 
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -230,7 +232,7 @@ def save_checkpoint(net, acc, epoch):
 def adjust_learning_rate(optimizer, epoch):
     """ Decrease learning rate at certain epochs. """
     lr = args.lr
-    if args.data == 'cifar10':
+    if args.data == 'cifar100':
         if epoch >= 100:
             lr /= 10
         if epoch >= 150:
@@ -252,13 +254,14 @@ def main():
     ## --------------- Prepare data --------------- ##
     print('==> Preparing data..')
 
+
     cifar_normalize = transforms.Normalize(
-        (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+        (0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
 
     if args.augment:
         transform_cifar_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
+            transforms.RandomHorizontalFlip(0.5),
             transforms.ToTensor(),
             cifar_normalize
         ])
@@ -268,21 +271,16 @@ def main():
             cifar_normalize
         ])
 
-    transform_cifar_test = transforms.Compose([
-        transforms.ToTensor(),
-        cifar_normalize
-    ])
-
-    if args.data == 'cifar10':
-        trainset = datasets.CIFAR10(root='./data',
+    if args.data == 'cifar100':
+        trainset = datasets.CIFAR100(root='./data',
                                     train=True,
                                     download=True,
                                     transform=transform_cifar_train)
-        testset = datasets.CIFAR10(root='./data',
+        testset = datasets.CIFAR100(root='./data',
                                    train=False,
                                    download=True,
-                                   transform=transform_cifar_test)
-        num_class = 10
+                                   transform=transform_cifar_train)
+        num_class = 100
     # You can add your own dataloader and preprocessor here.
 
     trainloader = torch.utils.data.DataLoader(trainset,
@@ -348,6 +346,23 @@ def main():
             logwriter.writerow(
                 [epoch, train_loss, test_loss, test_acc1])
 
+
+    image_before_encoding = mix_inputs_all[0].cpu().numpy().transpose(1, 2, 0)
+    image_after_encoding = net(mix_inputs_all)[0].cpu().detach().numpy().transpose(1, 2, 0)
+
+    # Visualizza l'immagine prima dell'encoding
+    plt.figure()
+    plt.title('Image Before Encoding')
+    plt.imshow(image_before_encoding)
+    plt.axis('off')
+
+    # Visualizza l'immagine dopo l'encoding
+    plt.figure()
+    plt.title('Image After Encoding')
+    plt.imshow(image_after_encoding)
+    plt.axis('off')
+
+    plt.show()
 
 if __name__ == '__main__':
     main()
