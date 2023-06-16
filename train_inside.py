@@ -339,8 +339,10 @@ def main():
         mix_inputs_all, mix_targets_all, lams, image_before_encoding = generate_sample(trainloader)
 
         
+        plt.imsave('image_before_encoding.jpg', image_before_encoding)  # Salva l'immagine nel percorso specificato
 
         image_after_encoding = mix_inputs_all[0].cpu().detach().numpy().transpose(1, 2, 0)
+        plt.imsave('image_after_encoding.jpg', image_after_encoding)  # Salva l'immagine nel percorso specificato
 
         # Visualizza l'immagine prima dell'encoding
         plt.figure()
