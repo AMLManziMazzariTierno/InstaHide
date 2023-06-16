@@ -314,7 +314,7 @@ def main():
 
 
     img, label = testloader.dataset[0]
-    img_prova = img.unsqueeze(0)
+    img_prova = Image.fromarray(img * 255).unsqueeze(0)
     img_prova.save("image_before_encoding.png")
 
 
