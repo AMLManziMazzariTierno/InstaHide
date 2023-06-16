@@ -343,10 +343,13 @@ def main():
         cudnn.benchmark = True
         print('==> Using CUDA..')
 
-
+    device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+    if torch.cuda.is_available():
+        print(f'GPU : {torch.cuda.get_device_name(device=device)}')
     
-    dm = torch.as_tensor(cifar100_mean)[:, None, None]
-    ds = torch.as_tensor(cifar100_std)[:, None, None]
+    
+    dm = torch.as_tensor(cifar100_mean, device=device)[:, None, None]
+    ds = torch.as_tensor(cifar100_std, device=device)[:, None, None]
     
     def plot(tensor):
         tensor = tensor.clone().detach()
