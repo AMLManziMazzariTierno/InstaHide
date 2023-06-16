@@ -250,10 +250,6 @@ def adjust_learning_rate(optimizer, epoch):
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
 
-def prova1():
-    return(2)
-
-
 def main():
     global best_acc
     start_epoch = 0  # start from epoch 0 or last checkpoint epoch
@@ -267,9 +263,11 @@ def main():
     ## --------------- Prepare data --------------- ##
     print('==> Preparing data..')
 
+    cifar100_mean = [0.5071598291397095, 0.4866936206817627, 0.44120192527770996]
+    cifar100_std = [0.2673342823982239, 0.2564384639263153, 0.2761504650115967]
 
     cifar_normalize = transforms.Normalize(
-        (0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        cifar100_mean, cifar100_std)
 
     if args.augment:
         transform_cifar_train = transforms.Compose([
@@ -315,11 +313,29 @@ def main():
                                              shuffle=False,
                                              num_workers=8)
 
+
+
+
+    dm = torch.as_tensor(cifar100_mean, device='cuda')[:, None, None]
+    ds = torch.as_tensor(cifar100_std, device='cuda')[:, None, None]
     
+    def plot(tensor):
+        tensor = tensor.clone().detach()
+        tensor.mul_(ds).add_(dm).clamp_(0, 1)
+        if tensor.shape[0] == 1:
+            return plt.imshow(tensor[0].permute(1, 2, 0).cpu());
+        else:
+            fig, axes = plt.subplots(1, tensor.shape[0], figsize=(12, tensor.shape[0]*12))
+            for i, im in enumerate(tensor):
+                axes[i].imshow(im.permute(1, 2, 0).cpu());
+
+
+
     img_prova, label = testloader.dataset[0]
-    
-    plt.imshow(img_prova)
-    plt.show()
+    #labels = torch.as_tensor((label,), device=setup['device'])
+    before_img = img_prova.unsqueeze(0)
+    plot(before_img);
+
 
 
     ## --------------- Create the model --------------- ##
