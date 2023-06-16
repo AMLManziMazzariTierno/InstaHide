@@ -5,3 +5,4 @@ from .densenet import *
 from .googlenet import *
 from .mobilenet import *
 from .nasnet import *
+from .ResNet20 import *

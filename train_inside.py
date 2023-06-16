@@ -140,9 +140,10 @@ def generate_sample(trainloader):
     for _, (inputs, targets) in enumerate(trainloader):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
+        image_before_encoding = inputs[0].cpu().numpy().transpose(1, 2, 0)
         mix_inputs, mix_targets, lams = mixup_data(
             inputs, targets.float(), use_cuda)
-    return (mix_inputs, mix_targets, lams)
+    return (mix_inputs, mix_targets, lams, image_before_encoding)
 
 
 def train(net, optimizer, inputs_all, mix_targets_all, lams, epoch):
@@ -335,7 +336,26 @@ def main():
             ])
 
     for epoch in range(start_epoch, args.epoch):
-        mix_inputs_all, mix_targets_all, lams = generate_sample(trainloader)
+        mix_inputs_all, mix_targets_all, lams, image_before_encoding = generate_sample(trainloader)
+
+        
+
+        image_after_encoding = mix_inputs_all[0].cpu().detach().numpy().transpose(1, 2, 0)
+
+        # Visualizza l'immagine prima dell'encoding
+        plt.figure()
+        plt.title('Image Before Encoding')
+        plt.imshow(image_before_encoding)
+        plt.axis('off')
+
+        # Visualizza l'immagine dopo l'encoding
+        plt.figure()
+        plt.title('Image After Encoding')
+        plt.imshow(image_after_encoding)
+        plt.axis('off')
+
+        plt.show()
+        
         train_loss, _ = train(
             net, optimizer, mix_inputs_all, mix_targets_all, lams, epoch)
         test_loss, test_acc1, = test(
@@ -345,24 +365,6 @@ def main():
             logwriter = csv.writer(logfile, delimiter='\t')
             logwriter.writerow(
                 [epoch, train_loss, test_loss, test_acc1])
-
-
-    image_before_encoding = mix_inputs_all[0].cpu().numpy().transpose(1, 2, 0)
-    image_after_encoding = net(mix_inputs_all)[0].cpu().detach().numpy().transpose(1, 2, 0)
-
-    # Visualizza l'immagine prima dell'encoding
-    plt.figure()
-    plt.title('Image Before Encoding')
-    plt.imshow(image_before_encoding)
-    plt.axis('off')
-
-    # Visualizza l'immagine dopo l'encoding
-    plt.figure()
-    plt.title('Image After Encoding')
-    plt.imshow(image_after_encoding)
-    plt.axis('off')
-
-    plt.show()
 
 if __name__ == '__main__':
     main()
