@@ -77,6 +77,9 @@ best_acc = 0  # best test accuracy
 ## --------------- Functions for train & eval --------------- ##
 
 
+def prova():
+    return 2
+
 def label_to_onehot(target, num_classes=args.nclass):
     '''Returns one-hot embeddings of scaler labels'''
     target = torch.unsqueeze(target, 1)
