@@ -19,6 +19,7 @@ import torch.nn.functional as F
 import random
 
 from PIL import Image
+from torchvision.transforms import ToPILImage
 import matplotlib.pyplot as plt
 
 import models
@@ -312,10 +313,14 @@ def main():
                                              shuffle=False,
                                              num_workers=8)
 
+    
+    img_prova, label = testloader.dataset[0]
+    
+    to_pil = ToPILImage()
+    pil_image = to_pil(img_prova)
 
-    img, label = testloader.dataset[0]
-    img_prova = Image.fromarray(img * 255).unsqueeze(0)
-    img_prova.save("image_before_encoding.png")
+    pil_image.save("image_before_encoding.png")
+
 
 
     ## --------------- Create the model --------------- ##
