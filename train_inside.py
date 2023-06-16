@@ -351,11 +351,11 @@ def main():
         tensor = tensor.clone().detach()
         tensor.mul_(ds).add_(dm).clamp_(0, 1)
         if tensor.shape[0] == 1:
-            return plt.imshow(tensor[0].permute(1, 2, 0).cpu());
+            return plt.imshow(tensor[0].permute(1, 2, 0).cpu())
         else:
             fig, axes = plt.subplots(1, tensor.shape[0], figsize=(12, tensor.shape[0]*12))
             for i, im in enumerate(tensor):
-                axes[i].imshow(im.permute(1, 2, 0).cpu());
+                axes[i].imshow(im.permute(1, 2, 0).cpu())
 
 
 
@@ -364,7 +364,7 @@ def main():
     before_img = img_prova.unsqueeze(0)
 
     before_img = before_img.to(device)
-    plot(before_img);
+    plot(before_img)
 
 
 
