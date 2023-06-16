@@ -138,14 +138,11 @@ def mixup_data(x, y, use_cuda=True):
     return mixed_x, ys, lams
 
 
-def generate_sample(trainloader, transform_original):
+def generate_sample(trainloader):
     assert len(trainloader) == 1        # Load all training data once
     for _, (inputs, targets) in enumerate(trainloader):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
-        image_before_encoding = transform_original(inputs[0]).cpu().numpy().transpose(1, 2, 0)
-        image_before_encoding = Image.fromarray((image_before_encoding * 255).astype(np.uint8))
-        image_before_encoding.save("image_before_encoding.png")
 
         mix_inputs, mix_targets, lams = mixup_data(
             inputs, targets.float(), use_cuda)
@@ -285,11 +282,6 @@ def main():
         ])
 
 
-    transform_original = transforms.Compose([
-        transforms.ToTensor(),
-        cifar_normalize
-    ])
-
     if args.data == 'cifar100':
         trainset = datasets.CIFAR100(root='./data',
                                     train=True,
@@ -301,7 +293,13 @@ def main():
                                    transform=transform_cifar_train)
         num_class = 100
     # You can add your own dataloader and preprocessor here.
+    immagine_prova, lab_prova = trainset[0]
+    
+    
+    immagine_prova.save("image_before_encoding.png")
 
+    
+    
     trainloader = torch.utils.data.DataLoader(trainset,
                                               batch_size=len(trainset),
                                               shuffle=True,
@@ -354,7 +352,7 @@ def main():
             ])
 
     for epoch in range(start_epoch, args.epoch):
-        mix_inputs_all, mix_targets_all, lams = generate_sample(trainloader, transform_original)
+        mix_inputs_all, mix_targets_all, lams = generate_sample(trainloader)
         
         train_loss, _ = train(
             net, optimizer, mix_inputs_all, mix_targets_all, lams, epoch)
