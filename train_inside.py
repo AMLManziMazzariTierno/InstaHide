@@ -18,6 +18,7 @@ import torchvision.datasets as datasets
 import torch.nn.functional as F
 import random
 
+from IPython.display import display
 from PIL import Image
 from torchvision.transforms import ToPILImage
 import matplotlib.pyplot as plt
@@ -365,7 +366,8 @@ def main():
 
     before_img = before_img.to(device)
     plot(before_img)
-
+    plt.show()
+    display(plt.gcf())
 
 
 
