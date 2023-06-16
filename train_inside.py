@@ -7,7 +7,7 @@ import csv
 import os
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 import torch
 from torch.autograd import Variable
 import torch.backends.cudnn as cudnn
@@ -18,10 +18,9 @@ import torchvision.datasets as datasets
 import torch.nn.functional as F
 import random
 
-from IPython.display import display
 from PIL import Image
 from torchvision.transforms import ToPILImage
-import matplotlib.pyplot as plt
+
 
 import models
 from utils import progress_bar, chunks, save_fig
@@ -367,13 +366,7 @@ def main():
     before_img = before_img.to(device)
     plot(before_img)
     plt.show()
-    display(plt.gcf())
-
-    pil_img = Image.fromarray((before_img.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8))
-
-# Visualizza l'immagine PIL
-    display(pil_img)
-
+    
 
 
     optimizer = optim.SGD(net.parameters(),
