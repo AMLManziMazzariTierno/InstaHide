@@ -281,6 +281,10 @@ def main():
             cifar_normalize
         ])
 
+    transform_cifar_test = transforms.Compose([
+        transforms.ToTensor(),
+        cifar_normalize
+    ])
 
     if args.data == 'cifar100':
         trainset = datasets.CIFAR100(root='./data',
@@ -290,15 +294,12 @@ def main():
         testset = datasets.CIFAR100(root='./data',
                                    train=False,
                                    download=True,
-                                   transform=transform_cifar_train)
+                                   transform=transform_cifar_test)
+
+
+
         num_class = 100
     # You can add your own dataloader and preprocessor here.
-    immagine_prova, lab_prova = trainset[0]
-    
-    immagi = immagine_prova.cpu().numpy().transpose(1, 2, 0)
-    img_prova = Image.fromarray((immagi * 255).astype(np.uint8))
-    img_prova.save("image_before_encoding.png")
-
     
     
     trainloader = torch.utils.data.DataLoader(trainset,
@@ -310,6 +311,12 @@ def main():
                                              batch_size=args.batch_size,
                                              shuffle=False,
                                              num_workers=8)
+
+
+    img, label = testloader.dataset[0]
+    img_prova = img.unsqueeze(0)
+    img_prova.save("image_before_encoding.png")
+
 
     ## --------------- Create the model --------------- ##
     if args.resume:
