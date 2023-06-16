@@ -316,8 +316,8 @@ def main():
 
 
 
-    dm = torch.as_tensor(cifar100_mean, device='cuda')[:, None, None]
-    ds = torch.as_tensor(cifar100_std, device='cuda')[:, None, None]
+    dm = torch.as_tensor(cifar100_mean)[:, None, None]
+    ds = torch.as_tensor(cifar100_std)[:, None, None]
     
     def plot(tensor):
         tensor = tensor.clone().detach()
