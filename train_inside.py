@@ -148,10 +148,6 @@ def generate_sample(trainloader):
         mix_inputs, mix_targets, lams = mixup_data(
             inputs, targets.float(), use_cuda)
 
-       
-    plt.imshow(mix_inputs[0])
-    plt.show()
-
     return (mix_inputs, mix_targets, lams)
 
 
