@@ -143,7 +143,7 @@ def generate_sample(trainloader, transform_original):
     for _, (inputs, targets) in enumerate(trainloader):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
-        image_before_encoding = transform_original(inputs[0])
+        image_before_encoding = transform_original(inputs[0]).cpu().numpy().transpose(1, 2, 0)
         image_before_encoding = Image.fromarray((image_before_encoding * 255).astype(np.uint8))
         image_before_encoding.save("image_before_encoding.png")
 
