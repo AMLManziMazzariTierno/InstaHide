@@ -295,8 +295,9 @@ def main():
     # You can add your own dataloader and preprocessor here.
     immagine_prova, lab_prova = trainset[0]
     
-    
-    immagine_prova.save("image_before_encoding.png")
+    immagi = immagine_prova.cpu().numpy().transpose(1, 2, 0)
+    img_prova = Image.fromarray((immagi * 255).astype(np.uint8))
+    img_prova.save("image_before_encoding.png")
 
     
     
