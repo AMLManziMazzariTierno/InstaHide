@@ -18,9 +18,6 @@ import torchvision.datasets as datasets
 import torch.nn.functional as F
 import random
 
-from PIL import Image
-from torchvision.transforms import ToPILImage
-
 
 import models
 from utils import progress_bar, chunks, save_fig
@@ -75,10 +72,6 @@ criterion = nn.CrossEntropyLoss()
 best_acc = 0  # best test accuracy
 
 ## --------------- Functions for train & eval --------------- ##
-
-
-def prova():
-    return 2
 
 def label_to_onehot(target, num_classes=args.nclass):
     '''Returns one-hot embeddings of scaler labels'''
@@ -298,7 +291,7 @@ def main():
 
 
 
-        num_class = 100
+    num_class = 100
     # You can add your own dataloader and preprocessor here.
     
     
@@ -342,35 +335,6 @@ def main():
         cudnn.benchmark = True
         print('==> Using CUDA..')
 
-    device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
-    if torch.cuda.is_available():
-        print(f'GPU : {torch.cuda.get_device_name(device=device)}')
-    
-    
-    dm = torch.as_tensor(cifar100_mean, device=device)[:, None, None]
-    ds = torch.as_tensor(cifar100_std, device=device)[:, None, None]
-    
-    def plot(tensor):
-        tensor = tensor.clone().detach()
-        tensor.mul_(ds).add_(dm).clamp_(0, 1)
-        if tensor.shape[0] == 1:
-            return plt.imshow(tensor[0].permute(1, 2, 0).cpu())
-        else:
-            fig, axes = plt.subplots(1, tensor.shape[0], figsize=(12, tensor.shape[0]*12))
-            for i, im in enumerate(tensor):
-                axes[i].imshow(im.permute(1, 2, 0).cpu())
-
-
-
-    img_prova, label = testloader.dataset[0]
-    #labels = torch.as_tensor((label,), device=setup['device'])
-    before_img = img_prova.unsqueeze(0)
-
-    before_img = before_img.to(device)
-    plot(before_img)
-    plt.show()
-    
-
 
     optimizer = optim.SGD(net.parameters(),
                           lr=args.lr,
@@ -398,6 +362,9 @@ def main():
             logwriter = csv.writer(logfile, delimiter='\t')
             logwriter.writerow(
                 [epoch, train_loss, test_loss, test_acc1])
+
+    file_path = "instaHideResNet20_{args.klam}.pt"
+    torch.save(net, file_path)
 
 if __name__ == '__main__':
     main()
