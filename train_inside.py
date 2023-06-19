@@ -363,8 +363,9 @@ def main():
             logwriter.writerow(
                 [epoch, train_loss, test_loss, test_acc1])
 
-    file_path = "instaHideResNet20_{args.klam}.pt"
-    torch.save(net, file_path)
+    file_path = "instaHideResNet20_{str(args.klam)}"
+    torch.save(net.state_dict(), f'{file_path}.pt')
 
+    
 if __name__ == '__main__':
     main()
