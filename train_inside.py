@@ -331,7 +331,7 @@ def main():
 
     if use_cuda:
         net.cuda()
-        net = torch.nn.DataParallel(net)
+        #net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
         print('==> Using CUDA..')
 
